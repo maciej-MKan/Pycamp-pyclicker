@@ -1,3 +1,4 @@
+import pickle
 from pynput.mouse import Listener as MouseListener
 from time import sleep
 
@@ -17,8 +18,8 @@ class MouseRecorder:
         sleep(run_time)
     
     def save(self, output_file = 'out.txt'):
-        with open(output_file, 'a', encoding='utf-8') as file:
-            file.write(str(self._moves))
+        with open(output_file, 'wb') as file:
+            pickle.dump(self._moves, file)
 
 if __name__ == '__main__':
     with MouseRecorder() as recorder:
