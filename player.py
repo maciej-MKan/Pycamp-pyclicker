@@ -1,13 +1,12 @@
-from shutil import move
-import pickle
+import json
 from pynput.mouse import Controller
 from time import sleep
 
 mouse = Controller()
 
-with open('out.txt', 'rb') as file:
-    moves = pickle.load(file)
+with open('out.json', 'r') as file:
+    moves = json.load(file)
     for single_move in moves:
-        mouse.position = single_move
+        mouse.position = tuple(single_move)
         sleep(0.02)
 
