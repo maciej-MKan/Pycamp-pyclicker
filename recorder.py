@@ -1,11 +1,15 @@
 import json
+from tkinter.tix import ButtonBox
 from pynput.mouse import Listener as MouseListener
 from time import sleep
 
 class MouseRecorder:
     def __init__(self) -> None:
         self._moves = []
-        self._listener = MouseListener(on_move= lambda x ,y : self._moves.append((x, y)))
+        self._listener = MouseListener(
+            on_move= lambda x ,y : self._moves.append({'move': (x, y)}),
+            on_click= lambda x, y, button, pressed : self._moves.append({'click': {button.name : [pressed, (x, y)]}})
+        )
 
     def __enter__(self):
         return self
