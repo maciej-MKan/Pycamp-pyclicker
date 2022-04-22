@@ -1,4 +1,4 @@
-import pickle
+import json
 from pynput.mouse import Listener as MouseListener
 from time import sleep
 
@@ -17,9 +17,9 @@ class MouseRecorder:
         self._listener.start()
         sleep(run_time)
     
-    def save(self, output_file = 'out.txt'):
-        with open(output_file, 'wb') as file:
-            pickle.dump(self._moves, file)
+    def save(self, output_file = 'out.json'):
+        with open(output_file, 'w') as file:
+            json.dump(self._moves, file)
 
 if __name__ == '__main__':
     with MouseRecorder() as recorder:
