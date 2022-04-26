@@ -1,6 +1,6 @@
 import json
 from pynput.mouse import Button, Controller as MouseController
-from pynput.keyboard import Controller as KeyController
+from pynput.keyboard import Key, Controller as KeyController
 from time import sleep
 
 class Mouse:
@@ -23,9 +23,26 @@ class Mouse:
         else:
             self.controler.release(button)
 
+class Keyboard:
+    def __init__(self) -> None:
+        self.controler = KeyController()
+
+    def press(self, key_to_press : str):
+        specjal = key_to_press.split('.')
+        if len(specjal) > 1:
+            key_to_press = getattr(Key, specjal[1])
+        self.controler.press(key_to_press)
+
+    def release(self, key_to_rel : str):
+        specjal = key_to_rel.split('.')
+        if len(specjal) > 1:
+            key_to_rel = getattr(Key, specjal[1])
+        self.controler.release(key_to_rel)
+
 class Player:
     def __init__(self) -> None:
         self.mouse = Mouse()
+        self.keyboard = Keyboard()
 
     def load_commands(self):
         with open('out.json', 'r') as file:
@@ -38,7 +55,7 @@ class Player:
                 event_args = event[event_type]
                 #print(device, ' ', event, ' ', event_type, ' ', event_args)
                 getattr(device, event_type)(event_args)
-                sleep(0.02)
+                sleep(0.05)
 
 
 
