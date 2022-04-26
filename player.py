@@ -1,7 +1,7 @@
 import json
+from time import sleep
 from pynput.mouse import Button, Controller as MouseController
 from pynput.keyboard import Key, Controller as KeyController
-from time import sleep
 
 class Mouse:
     def __init__(self) -> None:
@@ -47,7 +47,7 @@ class Player:
         self.keyboard = Keyboard()
 
     def load_commands(self, file_name = 'out'):
-        with open(f'{file_name}.json', 'r') as file:
+        with open(f'{file_name}.json', 'r', encoding='utf-8') as file:
             commands = json.load(file)
             for command in commands:
                 device_name, *_ = command.keys()
@@ -55,14 +55,9 @@ class Player:
                 event = command[device_name]
                 event_type, *_ = event.keys()
                 event_args = event[event_type]
-                #print(device, ' ', event, ' ', event_type, ' ', event_args)
                 getattr(device, event_type)(event_args)
                 sleep(0.05)
-
-
-
 
 if __name__ == '__main__':
     player = Player()
     player.load_commands()
-
