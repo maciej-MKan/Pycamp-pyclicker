@@ -2,6 +2,10 @@ import json
 from pynput.mouse import Listener as MouseListener
 from pynput.keyboard import KeyCode, Listener as KeyListener
 from time import sleep
+from itertools import cycle
+
+class StopRecording(Exception):
+    """exc to stop rec"""
 
 class MouseRecorder:
     def __init__(self, record_container : list) -> None:
@@ -48,7 +52,11 @@ class KeyboardRecorder:
         try:
             self.events.append({'keyboard': {'press': pressed_key.char}})
         except AttributeError:
-            self.events.append({'keyboard': {'press': str(pressed_key)}})
+            if str(pressed_key) == 'Key.esc':
+                self._listener.stop()
+                raise StopRecording
+            else:
+                self.events.append({'keyboard': {'press': str(pressed_key)}})
 
     def _on_release(self, rel_key : KeyCode):
         try:
@@ -64,14 +72,21 @@ class MainRecorder:
     def record(self, rec_time):
         with MouseRecorder(self._events):
             with KeyboardRecorder(self._events):
-                sleep(rec_time)
+                cur_time = 0
+                for frame in cycle(r'-\|/-\|/'):
+                    print('\r', frame, sep='', end='', flush=True)
+                    sleep(0.2)
+                    cur_time += 0.2
+                    if cur_time >= rec_time:
+                        break
 
         #print(self._events)
 
 
-    def save(self, output_file = 'out.json'):
-        with open(output_file, 'w') as file:
+    def save(self, output_file = 'out'):
+        with open(f'{output_file}.json', 'w') as file:
             json.dump(self._events, file, indent=4)
+        self._events.clear()
 
 if __name__ == '__main__':
     main_recorder = MainRecorder()

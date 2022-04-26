@@ -32,20 +32,22 @@ class Keyboard:
         if len(specjal) > 1:
             key_to_press = getattr(Key, specjal[1])
         self.controler.press(key_to_press)
+        sleep(0.08)
 
     def release(self, key_to_rel : str):
         specjal = key_to_rel.split('.')
         if len(specjal) > 1:
             key_to_rel = getattr(Key, specjal[1])
         self.controler.release(key_to_rel)
+        sleep(0.08)
 
 class Player:
     def __init__(self) -> None:
         self.mouse = Mouse()
         self.keyboard = Keyboard()
 
-    def load_commands(self):
-        with open('out.json', 'r') as file:
+    def load_commands(self, file_name = 'out'):
+        with open(f'{file_name}.json', 'r') as file:
             commands = json.load(file)
             for command in commands:
                 device_name, *_ = command.keys()
