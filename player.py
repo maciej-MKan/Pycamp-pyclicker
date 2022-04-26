@@ -1,23 +1,16 @@
 import json
-from pynput.mouse import Controller, Button
+from pynput.mouse import Button, Controller as MouseController
+from pynput.keyboard import Controller as KeyController
 from time import sleep
 
-class Player:
+class Mouse:
     def __init__(self) -> None:
-        self.mouse = Controller()
-
-    def load_commands(self):
-        with open('out.json', 'r') as file:
-            commands = json.load(file)
-            for command in commands:
-                key, *_ = command.keys()
-                getattr(self, key)(command[key])
-                sleep(0.02)
+        self.controler = MouseController()
 
     def move(self, args):
         if len(args) == 2:
             pos_x, pos_y = args
-            self.mouse.position = (pos_x, pos_y)
+            self.controler.position = (pos_x, pos_y)
         else:
             raise AttributeError(f'No 2 args {args}')
 
@@ -26,9 +19,28 @@ class Player:
         button = getattr(Button, button_name)
         pressed = args[button_name]
         if pressed:
-            self.mouse.press(button)
+            self.controler.press(button)
         else:
-            self.mouse.release(button)
+            self.controler.release(button)
+
+class Player:
+    def __init__(self) -> None:
+        self.mouse = Mouse()
+
+    def load_commands(self):
+        with open('out.json', 'r') as file:
+            commands = json.load(file)
+            for command in commands:
+                device_name, *_ = command.keys()
+                device = getattr(self, device_name)
+                event = command[device_name]
+                event_type, *_ = event.keys()
+                event_args = event[event_type]
+                #print(device, ' ', event, ' ', event_type, ' ', event_args)
+                getattr(device, event_type)(event_args)
+                sleep(0.02)
+
+
 
 
 if __name__ == '__main__':
