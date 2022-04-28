@@ -45,10 +45,19 @@ class Player:
     def __init__(self) -> None:
         self.mouse = Mouse()
         self.keyboard = Keyboard()
+        self.macro = None
 
-    def load_commands(self, file_name = 'out'):
-        with open(f'{file_name}.json', 'r', encoding='utf-8') as file:
-            commands = json.load(file)
+    def load_macro(self, file_name = 'out'):
+        try:
+            with open(f'{file_name}.json', 'r', encoding='utf-8') as file:
+                self.macro = json.load(file)
+        except FileNotFoundError:
+            return {'steps': 'No macros to load'}
+        return self.macro
+
+    def play_commands(self, commands= None):
+            if not commands:
+                commands = self.macro['steps']
             for command in commands:
                 device_name, *_ = command.keys()
                 device = getattr(self, device_name)
@@ -60,4 +69,5 @@ class Player:
 
 if __name__ == '__main__':
     player = Player()
-    player.load_commands()
+    player.load_macro()
+    player.play_commands()

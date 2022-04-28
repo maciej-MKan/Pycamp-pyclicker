@@ -14,7 +14,8 @@ def main():
                 pass
             my_recorder.save(input('enter macro name : '))
         if choice == '2':
-            my_player.load_commands(input('enter macro name : '))
+            my_player.load_macro(input('enter macro name : '))
+            my_player.play_commands()
 
 if __name__ == '__main__':
     main()
