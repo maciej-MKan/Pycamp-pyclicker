@@ -19,3 +19,6 @@ To run the GUI, enter:
 ```
 $ python gui.py
 ```
+
+### Tips
+To stop recording, press Esc or wait one minute
