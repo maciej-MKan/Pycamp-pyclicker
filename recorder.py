@@ -39,7 +39,7 @@ class KeyboardRecorder:
             on_press= self._on_press,
             on_release= self._on_release
         )
-        self._listener.start()
+        #self._listener.start()
         self.events = record_container
         self.stop_flag = stop_flag
 
@@ -50,41 +50,53 @@ class KeyboardRecorder:
         self._listener.stop()
 
     def _on_press(self, pressed_key : KeyCode):
-        try:
-            self.events.append({'keyboard': {'press': pressed_key.char}})
-        except AttributeError:
-            if str(pressed_key) == 'Key.esc':
-                self._listener.stop()
-                self.stop_flag.append('Stop')
-            else:
-                self.events.append({'keyboard': {'press': str(pressed_key)}})
+            try:
+                self.events.append({'keyboard': {'press': pressed_key.char}})
+            except AttributeError:
+                if str(pressed_key) == 'Key.esc':
+                    #self._listener.stop()
+                    self.stop_flag.append('Stop')
+                else:
+                    self.events.append({'keyboard': {'press': str(pressed_key)}})
 
     def _on_release(self, rel_key : KeyCode):
-        try:
-            self.events.append({'keyboard': {'release': rel_key.char}})
-        except AttributeError:
-            self.events.append({'keyboard': {'release': str(rel_key)}})
+            try:
+                self.events.append({'keyboard': {'release': rel_key.char}})
+            except AttributeError:
+                self.events.append({'keyboard': {'release': str(rel_key)}})
+
+    def start_record(self):
+        self._listener.start()
 
 class MainRecorder:
 
     def __init__(self, stop_record = None) -> None:
         self._events = []
         self._inner_stop_record = []
+        self.something = None
         if not stop_record:
             self.stop_record = self._inner_stop_record
 
-    def record(self, rec_time):
+    def record(self, rec_time, loop = None):
+        self._events.clear()
         sleep(0.2)
         with MouseRecorder(self._events):
-            with KeyboardRecorder(self._events, self._inner_stop_record):
-                cur_time = 0
-                for frame in cycle(r'-\|/-\|/'):
-                    print('\r', frame, sep='', end='', flush=True)
-                    sleep(0.2)
-                    cur_time += 0.2
-                    if cur_time >= rec_time or self.stop_record:
-                        self._inner_stop_record.clear()
-                        break
+            with KeyboardRecorder(self._events, self._inner_stop_record) as self.something:
+                self.something.start_record()
+                if loop:
+                    loop()
+                else:
+                    cur_time = 0
+                    for frame in cycle(r'-\|/-\|/'):
+                        print('\r', frame, sep='', end='', flush=True)
+                        if loop:
+                            pass
+                        else:
+                            sleep(0.2)
+                        cur_time += 0.2
+                        if cur_time >= rec_time or self.stop_record:
+                            self._inner_stop_record.clear()
+                            break
 
         #print(self._events)
 

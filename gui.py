@@ -1,3 +1,5 @@
+#!/usr/bin/env python3.8
+
 from time import sleep
 import tkinter as tk
 import json
@@ -30,7 +32,7 @@ class Gui(tk.Frame):
         self.bt_save['text'] = 'Save'
         self.bt_save['command'] = self.save
 
-        self.entry_macro = tk.Text(self, width=32, height= 27, padx=2, pady=2)
+        self.entry_macro = tk.Text(self, width=32, height= 25, padx=2, pady=2)
         self.scroll_macro = tk.Scrollbar(self, command=self.entry_macro.yview)
         self.entry_macro['yscrollcommand'] = self.scroll_macro.set
 
@@ -43,9 +45,10 @@ class Gui(tk.Frame):
 
 
     def record(self):
+        window_recorder = tk.Tk()
         self.entry_macro.delete('1.0', 'end')
         self.entry_macro.insert('end', 'To stop recording press Esc key')
-        self.recorder.record(60)
+        self.recorder.record(60, window_recorder.mainloop)
         self.entry_macro.delete('1.0', 'end')
         self.entry_macro.insert('end', json.dumps(self.recorder._events, indent=2))
 

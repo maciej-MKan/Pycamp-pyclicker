@@ -28,16 +28,20 @@ class Keyboard:
         self.controler = KeyController()
 
     def press(self, key_to_press : str):
-        specjal = key_to_press.split('.')
-        if len(specjal) > 1:
-            key_to_press = getattr(Key, specjal[1])
+        specjal = None
+        if len(key_to_press) > 2:
+            specjal = key_to_press.split('.')[1]
+        if specjal:
+            key_to_press = getattr(Key, specjal)
         self.controler.press(key_to_press)
         sleep(0.08)
 
     def release(self, key_to_rel : str):
-        specjal = key_to_rel.split('.')
-        if len(specjal) > 1:
-            key_to_rel = getattr(Key, specjal[1])
+        specjal = None
+        if len(key_to_rel) > 2:
+            specjal = key_to_rel.split('.')[1]
+        if specjal:
+            key_to_rel = getattr(Key, specjal)
         self.controler.release(key_to_rel)
         sleep(0.08)
 
