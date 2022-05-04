@@ -1,8 +1,11 @@
 #!/usr/bin/env python3.8
 
+from doctest import master
 from time import sleep
 import tkinter as tk
 import json
+
+from click import command
 import recorder
 import player
 
@@ -11,18 +14,18 @@ class Gui(tk.Frame):
         super().__init__(master)
         self.master = master
         self.pack()
-        self.recorder = recorder.MainRecorder()
+        self.recorder = recorder.MainRecorder(stop_flag=self.stop_currnt_record)
         self.player = player.Player()
         self.create_widgets()
 
     def create_widgets(self):
         self.bt_record = tk.Button(self)
         self.bt_record['text'] = 'Record new'
-        self.bt_record['command'] = self.record
+        self.bt_record['command'] = self.start_new_record
 
         self.bt_replay = tk.Button(self)
         self.bt_replay['text'] = 'Replay macro'
-        self.bt_replay['command'] = self.repaly
+        self.bt_replay['command'] = lambda : self.repaly(0)
 
         self.bt_load = tk.Button(self)
         self.bt_load['text'] = 'Load macro'
@@ -43,18 +46,39 @@ class Gui(tk.Frame):
         self.entry_macro.grid(column= 0, row= 2, columnspan= 9,  sticky="nsew")
         self.scroll_macro.grid(column= 9, row= 2, sticky='nsew')
 
+    def create_recorder_widget(self):
+        self.window_recorder = tk.Toplevel(self)
+        self.window_recorder.title('PyClicker - recording ...')
+        self.window_recorder.resizable(False,False)
+        self.window_recorder.transient(self)
+        self.wr_label = tk.Label(self.window_recorder)
+        self.wr_label['text'] = 'Now recording...\nTo stop press Esc'
+        self.window_recorder.protocol("WM_DELETE_WINDOW", self.stop_currnt_record)
+        #self.master.iconify()
+        self.wr_label.pack()
 
-    def record(self):
-        window_recorder = tk.Tk()
+    def start_new_record(self):
         self.entry_macro.delete('1.0', 'end')
         self.entry_macro.insert('end', 'To stop recording press Esc key')
-        self.recorder.record(60, window_recorder.mainloop)
+        self.create_recorder_widget()
+        self.recorder.start_record()
+
+    def stop_currnt_record(self):
+        self.recorder.stop_record()
+        self.window_recorder.destroy()
         self.entry_macro.delete('1.0', 'end')
         self.entry_macro.insert('end', json.dumps(self.recorder._events, indent=2))
+        #self.master.deiconify()
 
-    def repaly(self):
+    def repaly(self, step : int):
         #self.player.load_macro()
-        self.player.play_commands(json.loads(self.entry_macro.get('1.0','end')))
+        try:
+            comand = json.loads(self.entry_macro.get('1.0','end'))[step]
+            self.player.play_commands((comand,), sleep_time = 0)
+            step += 1
+            self.after(20, self.repaly, step)
+        except IndexError:
+            return
 
     def load(self):
         self.entry_macro.insert('end', json.dumps(self.player.load_macro()['steps'], indent=2))

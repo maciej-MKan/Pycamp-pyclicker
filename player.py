@@ -59,7 +59,7 @@ class Player:
             return {'steps': 'No macros to load'}
         return self.macro
 
-    def play_commands(self, commands= None):
+    def play_commands(self, commands : tuple = None, sleep_time : float = 0.05):
             if not commands:
                 commands = self.macro['steps']
             for command in commands:
@@ -69,7 +69,7 @@ class Player:
                 event_type, *_ = event.keys()
                 event_args = event[event_type]
                 getattr(device, event_type)(event_args)
-                sleep(0.05)
+                sleep(sleep_time)
 
 if __name__ == '__main__':
     player = Player()
