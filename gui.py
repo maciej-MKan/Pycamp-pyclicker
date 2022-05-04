@@ -1,15 +1,15 @@
 #!/usr/bin/env python3.8
 
-from doctest import master
-from time import sleep
+"""The main module of the graphic version of the program"""
+
 import tkinter as tk
 import json
 
-from click import command
 import recorder
 import player
 
 class Gui(tk.Frame):
+    """Main class inheriting from tkinter.Frame. Creates, sets and programs widgets"""
     def __init__(self, master = None) -> None:
         super().__init__(master)
         self.master = master
@@ -19,6 +19,8 @@ class Gui(tk.Frame):
         self.create_widgets()
 
     def create_widgets(self):
+        """Creates, sets and programs widgets of root window"""
+
         self.bt_record = tk.Button(self)
         self.bt_record['text'] = 'Record new'
         self.bt_record['command'] = self.start_new_record
@@ -47,6 +49,7 @@ class Gui(tk.Frame):
         self.scroll_macro.grid(column= 9, row= 2, sticky='nsew')
 
     def create_recorder_widget(self):
+        """Creates, sets and programs widgets of recorder sub-window"""
         self.window_recorder = tk.Toplevel(self)
         self.window_recorder.title('PyClicker - recording ...')
         self.window_recorder.resizable(False,False)
@@ -58,12 +61,14 @@ class Gui(tk.Frame):
         self.wr_label.pack()
 
     def start_new_record(self):
+        """call creates a recorder window and starts macro recording"""
         self.entry_macro.delete('1.0', 'end')
         self.entry_macro.insert('end', 'To stop recording press Esc key')
         self.create_recorder_widget()
         self.recorder.start_record()
 
     def stop_currnt_record(self):
+        """stops macro recording, sets macro content to widget, destroys recorder window"""
         self.recorder.stop_record()
         self.window_recorder.destroy()
         self.entry_macro.delete('1.0', 'end')
@@ -71,7 +76,11 @@ class Gui(tk.Frame):
         #self.master.deiconify()
 
     def repaly(self, step : int):
-        #self.player.load_macro()
+        """runs macro from widget
+
+        Args:
+            step (int): the number of steps in the macro to play back
+        """
         try:
             comand = json.loads(self.entry_macro.get('1.0','end'))[step]
             self.player.play_commands((comand,), sleep_time = 0)
@@ -81,14 +90,21 @@ class Gui(tk.Frame):
             return
 
     def load(self):
+        """loads macro from file and put them to widget"""
         self.entry_macro.insert('end', json.dumps(self.player.load_macro()['steps'], indent=2))
 
     def save(self):
+        """safes macro from widget to file"""
         self.recorder._events = json.loads(self.entry_macro.get('1.0','end'))
         self.recorder.save()
 
-root = tk.Tk()
-root.geometry('300x500')
-root.title('PyClicker')
-app = Gui(master=root)
-app.mainloop()
+def main():
+    """Main method. Sets root window and start mainloop"""
+    root = tk.Tk()
+    root.geometry('300x500')
+    root.title('PyClicker')
+    app = Gui(master=root)
+    app.mainloop()
+
+if __name__ == '__main__':
+    main()

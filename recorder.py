@@ -1,13 +1,16 @@
+#!/usr/bin/env python3.8
+
+"""Module that records mouse and keyboard events"""
+
 import json
 from time import sleep
 from itertools import cycle
 from pynput.mouse import Listener as MouseListener
 from pynput.keyboard import KeyCode, Listener as KeyListener
 
-class StopRecording(Exception):
-    """exc to stop rec"""
 
 class MouseRecorder:
+    """The class that starts the hooking of mouse events"""
     def __init__(self, record_container : list) -> None:
         self._listener = MouseListener(
             on_move= self._on_move,
@@ -24,23 +27,29 @@ class MouseRecorder:
         self._listener.stop()
 
     def _on_move(self, pos_x, pos_y):
+        """records mouse movements"""
         self.events.append({'mouse': {'move': (pos_x, pos_y)}})
 
     def _on_click(self, *args):
+        """records mouse buttons clicks"""
         *_, button, pressed = args
         self.events.append({'mouse': {'click': {button.name : pressed}}})
 
     def _on_scroll(self, *args):
+        """ToDo : records mouse scrol events"""
         print(args)
 
     def start_record(self):
+        """starts mouse listener"""
         self._listener.start()
 
     def __del__(self):
+        """stops the keyboard listener when an instance of the class is destroyed"""
         self._listener.stop()
 
 
 class KeyboardRecorder:
+    """The class that starts the hooking of keyboard events"""
     def __init__(self, record_container : list, stop_flag) -> None:
         self._listener = KeyListener(
             on_press= self._on_press,
@@ -57,25 +66,29 @@ class KeyboardRecorder:
         self._listener.stop()
 
     def _on_press(self, pressed_key : KeyCode):
-            try:
-                self.events.append({'keyboard': {'press': pressed_key.char}})
-            except AttributeError:
-                if str(pressed_key) == 'Key.esc':
-                    #self._listener.stop()
-                    self.stop_flag()
-                else:
-                    self.events.append({'keyboard': {'press': str(pressed_key)}})
+        """records keystrokes, if Esc is pressed call recording stop"""
+
+        try:
+            self.events.append({'keyboard': {'press': pressed_key.char}})
+        except AttributeError:
+            if str(pressed_key) == 'Key.esc':
+                self.stop_flag()
+            else:
+                self.events.append({'keyboard': {'press': str(pressed_key)}})
 
     def _on_release(self, rel_key : KeyCode):
-            try:
-                self.events.append({'keyboard': {'release': rel_key.char}})
-            except AttributeError:
-                self.events.append({'keyboard': {'release': str(rel_key)}})
+        """registers when a key is released"""
+        try:
+            self.events.append({'keyboard': {'release': rel_key.char}})
+        except AttributeError:
+            self.events.append({'keyboard': {'release': str(rel_key)}})
 
     def start_record(self):
+        """starts keyboard listener"""
         self._listener.start()
 
     def __del__(self):
+        """stops the keyboard listener when an instance of the class is destroyed"""
         self._listener.stop()
 
 class MainRecorder:

@@ -1,7 +1,13 @@
+#!/usr/bin/env python3.8
+
+"""The main module console version of the program"""
+
 import recorder
 import player
 
 def main():
+    """Main module. Shows the user interface and runs the appropriate commands"""
+
     my_recorder = recorder.MainRecorder()
     my_player = player.Player()
     choice =''
@@ -9,6 +15,7 @@ def main():
         choice = input('1 - record macro  2 - playback macro  3 - exit \n')
         if choice == '1':
             try:
+                # ToDo - user selectable recording time
                 my_recorder.record(20)
             except recorder.StopRecording:
                 pass
