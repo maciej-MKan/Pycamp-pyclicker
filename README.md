@@ -1,11 +1,12 @@
 # Pycamp-pyclicker
 Project from PyCamp module 4
+Mouse and kyboard recorder/player
 
 ## General info
-Program to record and replay keyboard and mouse events
+Program for automating activities performed with the use of a mouse and keyboard. It allows you to record a macro, edit it and play it back.
 
 ## Technologies
-The program was created in Python 3.8 with using pynput and json.
+The program was created in Python 3.8 using internal libraries such as json, tkinter and external pynput.
 
 ## Using
 
@@ -19,6 +20,3 @@ To run the GUI, enter:
 ```
 $ python gui.py
 ```
-
-### Tips
-To stop recording, press Esc or wait one minute
