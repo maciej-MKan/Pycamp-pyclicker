@@ -16,6 +16,8 @@ class Gui(tk.Frame):
         self.pack()
         self.recorder = recorder.MainRecorder(stop_flag=self.stop_currnt_record)
         self.player = player.Player()
+        self.window_recorder = None
+        self.wr_label = None
         self.create_widgets()
 
     def create_widgets(self):
@@ -72,7 +74,7 @@ class Gui(tk.Frame):
         self.recorder.stop_record()
         self.window_recorder.destroy()
         self.entry_macro.delete('1.0', 'end')
-        self.entry_macro.insert('end', json.dumps(self.recorder._events, indent=2))
+        self.entry_macro.insert('end', json.dumps(self.recorder.events, indent=2))
         #self.master.deiconify()
 
     def repaly(self, step : int):
@@ -95,7 +97,7 @@ class Gui(tk.Frame):
 
     def save(self):
         """safes macro from widget to file"""
-        self.recorder._events = json.loads(self.entry_macro.get('1.0','end'))
+        self.recorder.events = json.loads(self.entry_macro.get('1.0','end'))
         self.recorder.save()
 
 def main():

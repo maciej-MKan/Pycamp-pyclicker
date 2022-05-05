@@ -92,28 +92,47 @@ class KeyboardRecorder:
         self._listener.stop()
 
 class MainRecorder:
+    """The class linkinging and unifying the operation of recorders"""
 
     def __init__(self, stop_flag = None) -> None:
-        self._events = []
+        """recorder initialization parameters
+
+        Args:
+            stop_flag (functjon, optional): Function that puts a flag to stop the recorder.
+                                            Defaults to self._inner_stop_flag.
+
+        Fields:
+            self.events (list): list of the recorded steps
+            self.stop_recording (bool): flag to stop the recorder
+            self.recorders (list): list of recorders
+            self.stop_flag (functjon): function that puts a flag to stop the recorder
+        """
+        self.events = []
         self.stop_recording = False
         self.recorders = []
-        self.something = None
         self.stop_flag = stop_flag
         if not stop_flag:
             self.stop_flag = self._inner_stop_flag
 
     def _init_recorders(self):
-        self.recorders.append(MouseRecorder(self._events))
-        self.recorders.append(KeyboardRecorder(self._events, self.stop_flag))
+        """method includes unit recorders to the list of recorders"""
+        self.recorders.append(MouseRecorder(self.events))
+        self.recorders.append(KeyboardRecorder(self.events, self.stop_flag))
 
     def _inner_stop_flag(self):
+        """default method to stop the recorder"""
         self.stop_recording = True
 
-    def record(self, rec_time):
-        self._events.clear()
+    def record(self, rec_time : float):
+        """method to start recorders as context manager
+
+        Args:
+            rec_time (float): max recording time
+        """
+        self.events.clear()
         sleep(0.2)
-        with MouseRecorder(self._events):
-            with KeyboardRecorder(self._events, self.stop_flag):
+        with MouseRecorder(self.events):
+            with KeyboardRecorder(self.events, self.stop_flag):
                 cur_time = 0
                 for frame in cycle(r'-\|/-\|/'):
                     print('\r', frame, sep='', end='', flush=True)
@@ -123,21 +142,27 @@ class MainRecorder:
                         self.stop_recording = False
                         break
 
-        #print(self._events)
+    def start_record(self):
+        """method start recorders"""
 
-    def start_record(self, rec_time = 0):
-        self._events.clear()
-        if rec_time == 0:
-            self._init_recorders()
+        self.events.clear()
+        self._init_recorders()
 
     def stop_record(self):
+        """method to stop the recorder, after using it,
+        the recorder must be reinitialized before restarting"""
         self.recorders.clear()
 
     def save(self, output_file = 'out'):
-        output_dict = {'property': None, 'steps': self._events}
+        """method to save macro to file as json
+
+        Args:
+            output_file (str, optional): Name of file. Defaults to 'out'.
+        """
+        output_dict = {'property': None, 'steps': self.events}
         with open(f'{output_file}.json', 'w', encoding='utf-8') as file:
             json.dump(output_dict, file, indent=4)
-        self._events.clear()
+        self.events.clear()
 
 if __name__ == '__main__':
     main_recorder = MainRecorder()
